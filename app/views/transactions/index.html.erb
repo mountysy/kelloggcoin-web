@@ -2,7 +2,82 @@
 
 <!-- Step 1: List all transactions, starting with the ICO -->
 
+
+<% transactions = Transaction.all %>
+
+<ol>
+
+<% for transaction in transactions 
+  if transaction["from_user_id"] == nil
+    to_user = User.find_by({"id" => transaction["to_user_id"]})
+    to_user_name = to_user["name"]
+    from_user_name = "ICO"
+    amount = transaction["amount"] %>
+
+    <li> Initial Coin Offering: <%= amount%> KC to <%= to_user_name %> </li> 
+
+<% elsif transaction["from_user_id"] != nil
+    to_user = User.find_by({"id" => transaction["to_user_id"]})
+    from_user = User.find_by({"id" => transaction["from_user_id"]})
+    from_user_name = from_user["name"]
+    to_user_name = to_user["name"]
+    amount = transaction["amount"]
+
+  end
+  %>
+
+  <li> <%= amount%> KC from <%= from_user_name %> to <%= to_user_name %> </li> 
+
+<% end %>
+
+</ol>
+
+
+
+
 <!-- Step 2: Calculate and display the balances -->
+
+<%
+
+users = User.all
+wallet = users.each_with_object({}) do |user, hash|
+  hash[user.name] = {"name" => user.name, "balance" => 0}
+end
+
+# wallet = {
+# "Ben" => {"name"=>"Ben", "balance"=>0},
+# "Brian" => {"name"=>"Brian", "balance"=>0},
+# "Evan" => {"name"=>"Evan", "balance"=>0},
+# "Anthony" => {"name"=>"Anthony", "balance"=>0},
+# "Krystina" => {"name"=>"Krystina", "balance"=>0}
+# }
+
+for transaction in transactions 
+  if transaction["from_user_id"] == nil
+    to_user = User.find_by({"id" => transaction["to_user_id"]})
+    to_user_name = to_user["name"]
+    amount = transaction["amount"]
+    wallet[to_user_name]["balance"] = wallet[to_user_name]["balance"] + amount
+
+  elsif transaction["from_user_id"] != nil
+    from_user = User.find_by({"id" => transaction["from_user_id"]})
+    from_user_name = from_user["name"]
+    to_user = User.find_by({"id" => transaction["to_user_id"]})
+    to_user_name = to_user["name"]
+    amount = transaction["amount"]
+    wallet[from_user_name]["balance"] = wallet[from_user_name]["balance"] - amount
+    wallet[to_user_name]["balance"] = wallet[to_user_name]["balance"] + amount
+  
+  end
+end
+
+users = User.all
+for user in users %>
+  <p> Balance for <%= user["name"]%>: <%= wallet[user["name"]]["balance"] %> KC </p>
+
+<% end %>
+
+
 
 <!-- 
 Expected balances:

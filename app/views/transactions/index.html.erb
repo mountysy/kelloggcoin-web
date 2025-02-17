@@ -71,13 +71,21 @@ for transaction in transactions
   end
 end
 
-users = User.all
-for user in users %>
-  <p> Balance for <%= user["name"]%>: <%= wallet[user["name"]]["balance"] %> KC </p>
+users = User.all %>
 
-<% end %>
+<table/>
+ <tr>
+  <th> Balance User </th>
+  <th> Balance Amount </th>
+ </tr>
 
-
+  <%for user in users %>
+    <tr>
+      <td> <%= user["name"]%>: </td>
+      <td> <%= wallet[user["name"]]["balance"] %> KC </td>
+    </tr>
+  <% end %>
+</table>
 
 <!-- 
 Expected balances:
